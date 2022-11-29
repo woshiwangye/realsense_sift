@@ -19,6 +19,8 @@ if(NOT OpenCV_FOUND)
   message(FATAL_ERROR "OpenCV > 4.5 not found.")
 endif()
 
+MESSAGE("opencv include dirs: " ${OpenCV_INCLUDE_DIRS})
+
 include_directories(
     include
     ${OpenCV_INCLUDE_DIRS}
@@ -29,6 +31,9 @@ aux_source_directory(src DIR_SRCS)
 add_executable(hello apps/helloworld.cpp
     ${DIR_SRCS}
 )
+
+link_directories(/usr/lib/x86_64-linux-gnu)
 target_link_libraries(hello
     ${OpenCV_LIBS}
+    realsense2
 )
