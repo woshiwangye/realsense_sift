@@ -44,13 +44,21 @@ int main(int argc, char * argv[]) try
         Mat image1(Size(w, h), CV_8UC1, (void*)left_frame.get_data());
         Mat image2(Size(w, h), CV_8UC1, (void*)right_frame.get_data());
         // imshow("color image", image2);
-
+        
         // Create OpenCV matrix of size (w,h) from the colorized depth data
         // Mat image(Size(w, h), CV_8UC3, (void*)depth.get_data(), Mat::AUTO_STEP);
         // Mat pic_left(Size(w, h), CV_8UC1, (void*)left_frame.get_data());
         // Update the window with new data
         imshow(window_name, image1);
         imshow("right", image2);
+
+        static int i = 0;
+        if (++i == 200)
+        {
+            imwrite("a.jpg", image1);
+            imwrite("b.jpg", image2);
+        }
+        
         // imshow("left image", pic_left);
 
     }
