@@ -56,7 +56,7 @@ void sift(cv::Mat img1, cv::Mat img2)
     cout << "max_dist=" << max_dist << endl;
     //Æ¥Åä½á¹ûÉ¸Ñ¡    
     vector<DMatch> goodMatches;
-    for (int i = 0; i < matches.size(); ++i)
+    for (size_t i = 0; i < matches.size(); ++i)
     {
         double dist = matches[i].distance;
         if (dist < 0.2 * max_dist)
