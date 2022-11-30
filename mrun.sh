@@ -3,4 +3,4 @@ make
 cd ..
 echo "end of building and start to run:"
 echo ""
-./build/imshow 1
+./build/imshow 

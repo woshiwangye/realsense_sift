@@ -41,35 +41,12 @@ include_directories(
 
 aux_source_directory(src DIR_SRCS)
 
-
-add_executable(hello apps/helloworld.cpp
+add_executable(imshow apps/rs-imshow.cpp
     ${DIR_SRCS}
 )
 
 link_directories(/usr/lib/x86_64-linux-gnu)
-target_link_libraries(hello
-    ${OpenCV_LIBS}
-    ${realsense2_LIBRARY}
-    realsense2
-)
-
-
-add_executable(imshow apps/rs-imshow.cpp
-    ${DIR_SRCS}
-)
 target_link_libraries(imshow
-    ${OpenCV_LIBS}
-    ${realsense2_LIBRARY}
-    # ${OPENGL_LIBRARY}
-    # glut
-    realsense2
-)
-
-
-add_executable(all_data apps/all_data.cpp
-    ${DIR_SRCS}
-)
-target_link_libraries(all_data
     ${OpenCV_LIBS}
     ${realsense2_LIBRARY}
     # ${OPENGL_LIBRARY}

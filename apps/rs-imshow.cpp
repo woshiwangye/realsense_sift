@@ -7,15 +7,15 @@ void sift(cv::Mat img1, cv::Mat img2)
     using namespace cv;
     using namespace std;
     cout << "start to compare...\n";
-    //å®šä¹‰Siftçš„åŸºæœ?å‚æ•°
+    //¶¨ÒåSiftµÄ»ù±¾²ÎÊý
     int numFeatures = 500;
-    //åˆ›å»ºdetectorå­˜æ”¾åˆ°KeyPointsä¸?
+    //´´½¨detector´æ·Åµ½KeyPointsÖÐ
     Ptr<SIFT> detector = SIFT::create(numFeatures);
     vector<KeyPoint> m_LeftKey, m_RightKey;
     detector->detect(img1, m_LeftKey);
     detector->detect(img2, m_RightKey);
-    //æ‰“å°Keypoints
-    cout << "Keypoints:" << m_LeftKey.size() << endl;
+    //´òÓ¡Keypoints
+    cout << "Keypoints1:" << m_LeftKey.size() << endl;
     cout << "Keypoints2:" << m_RightKey.size() << endl;
     
     Mat drawsrc, drawsrc2;
@@ -24,7 +24,7 @@ void sift(cv::Mat img1, cv::Mat img2)
     drawKeypoints(img2, m_RightKey, drawsrc2);
     // imshow("drawsrc2", drawsrc2);
     
-    //è®¡ç®—ç‰¹å¾ç‚¹æè¿°ç??,ç‰¹å¾å‘é‡æå–
+    //¼ÆËãÌØÕ÷µãÃèÊö·û,ÌØÕ÷ÏòÁ¿ÌáÈ¡
     Mat dstSIFT, dstSIFT2;
     Ptr<SiftDescriptorExtractor> descriptor = SiftDescriptorExtractor::create();
     descriptor->compute(img1, m_LeftKey, dstSIFT);
@@ -33,19 +33,19 @@ void sift(cv::Mat img1, cv::Mat img2)
     cout << dstSIFT2.rows << endl;
     
     
-    //è¿›è?ŒBFMatchæš´åŠ›åŒ¹é…
+    //½øÐÐBFMatch±©Á¦Æ¥Åä
     BFMatcher matcher(NORM_L2);
-    //å®šä¹‰åŒ¹é…ç»“æžœå˜é‡
+    //¶¨ÒåÆ¥Åä½á¹û±äÁ¿
     vector<DMatch> matches;
-    //å®žçŽ°æè¿°ç¬¦ä¹‹é—´çš„åŒ¹é…
+    //ÊµÏÖÃèÊö·ûÖ®¼äµÄÆ¥Åä
     matcher.match(dstSIFT, dstSIFT2, matches);
 
-    //å®šä¹‰å‘é‡è·ç?»çš„æœ€å¤§å€¼ä¸Žæœ€å°å€?
+    //¶¨ÒåÏòÁ¿¾àÀëµÄ×î´óÖµÓë×îÐ¡Öµ
     double max_dist = 0;
     double min_dist = 1000;
     for (int i = 1; i < dstSIFT.rows; ++i)
     {
-        //é€šè¿‡å¾?çŽ?æ›´æ–°è·ç?»ï¼Œè·ç?»è¶Šå°è¶ŠåŒ¹é…
+        //Í¨¹ýÑ­»·¸üÐÂ¾àÀë£¬¾àÀëÔ½Ð¡Ô½Æ¥Åä
         double dist = matches[i].distance;
         if (dist > max_dist)
         max_dist = dist;
@@ -54,7 +54,7 @@ void sift(cv::Mat img1, cv::Mat img2)
     }
     cout << "min_dist=" << min_dist << endl;
     cout << "max_dist=" << max_dist << endl;
-    //åŒ¹é…ç»“æžœç­›é€?    
+    //Æ¥Åä½á¹ûÉ¸Ñ¡    
     vector<DMatch> goodMatches;
     for (int i = 0; i < matches.size(); ++i)
     {
@@ -71,21 +71,21 @@ void sift(cv::Mat img1, cv::Mat img2)
     imwrite("result_without_ransanc.jpg", img_matches);
     
     Mat result;
-    //åŒ¹é…ç‰¹å¾ç‚¹å¤©è“è‰²ï¼Œå•ä¸€ç‰¹å¾ç‚¹é?œè‰²éšæœº
+    //Æ¥ÅäÌØÕ÷µãÌìÀ¶É«£¬µ¥Ò»ÌØÕ÷µãÑÕÉ«Ëæ»ú
     drawMatches(img1, m_LeftKey, img2, m_RightKey, goodMatches, result, 
         Scalar(255, 255, 0), Scalar::all(-1));
-    // imshow("MatchSIFTç­›é€‰åŽ", result);
+    // imshow("after MatchSIFT", result);
     imwrite("result_after_match.jpg", result);
 
-    //RANSACåŒ¹é…è¿‡ç¨‹ ä½¿ç”¨ç­›é€‰åŽçš„siftåŒ¹é…ç‚?
+    //RANSACÆ¥Åä¹ý³Ì Ê¹ÓÃÉ¸Ñ¡ºóµÄsiftÆ¥Åäµã
     vector<DMatch> m_Matches = goodMatches;
-    // åˆ†é…ç©ºé—´
+    // ·ÖÅä¿Õ¼ä
     int ptCount = (int)m_Matches.size();
 
-    Mat p1(ptCount, 2, CV_32F);         //å­˜å‚¨å·¦å›¾åŒ¹é…ç‚¹åæ ?
-    Mat p2(ptCount, 2, CV_32F);         //å­˜å‚¨å³å›¾åŒ¹é…ç‚¹åæ ?
+    Mat p1(ptCount, 2, CV_32F);         //´æ´¢×óÍ¼Æ¥Åäµã×ø±ê
+    Mat p2(ptCount, 2, CV_32F);         //´æ´¢ÓÒÍ¼Æ¥Åäµã×ø±ê
 
-    // æŠŠKeypointè½?æ?ä¸ºMat
+    // °ÑKeypoint×ª»»ÎªMat
     Point2f pt;
     for (int i = 0; i < ptCount; i++)
     {
@@ -98,50 +98,50 @@ void sift(cv::Mat img1, cv::Mat img2)
         p2.at<float>(i, 1) = pt.y;
     }
 
-    // ç”¨RANSACæ–¹æ³•è®¡ç®—F
+    // ÓÃRANSAC·½·¨¼ÆËãF
     Mat m_Fundamental;
-    vector<uchar> m_RANSACStatus;       // è¿™ä¸ªå˜é‡ç”¨äºŽå­˜å‚¨RANSACåŽæ¯ä¸?ç‚¹çš„çŠ¶æ€?
+    vector<uchar> m_RANSACStatus;       // Õâ¸ö±äÁ¿ÓÃÓÚ´æ´¢RANSACºóÃ¿¸öµãµÄ×´Ì¬
     findFundamentalMat(p1, p2, m_RANSACStatus, FM_RANSAC);
 
-    // è®¡ç®—å¤–ç‚¹ä¸?æ•?  æœ?åŒ¹é…ç‚?
+    // ¼ÆËãÒ°µã¸öÊý  Î´Æ¥Åäµã
 
     int OutlinerCount = 0;
     for (int i = 0; i < ptCount; i++)
     {
-        if (m_RANSACStatus[i] == 0)    // çŠ¶æ€ä¸º0è¡¨ç¤ºé‡Žç‚¹
+        if (m_RANSACStatus[i] == 0)    //×´Ì¬Îª0±íÊ¾Ò°µã
         {
             OutlinerCount++;
         }
     }
-    int InlinerCount = ptCount - OutlinerCount;   // è®¡ç®—å†…ç‚¹ä¸?æ•?
+    int InlinerCount = ptCount - OutlinerCount;   // ¼ÆËãÄÚµã¸öÊý
     cout << "inner point count: " << InlinerCount << endl;
 
-    // è¿™ä¸‰ä¸?å˜é‡ç”¨äºŽä¿å­˜åŒ¹é…ç‚¹ï¼ˆå†…ç‚¹ï¼‰å’ŒåŒ¹é…å…³ç³»
-    vector<Point2f> m_LeftInlier;           //å·¦å›¾åŒ¹é…ç‚?
-    vector<Point2f> m_RightInlier;          //å³å›¾åŒ¹é…ç‚?
-    vector<DMatch> m_InlierMatches;         //åŒ¹é…å…³ç³»
+    // ÕâÈý¸ö±äÁ¿ÓÃÓÚ±£´æÆ¥Åäµã£¨ÄÚµã£©ºÍÆ¥Åä¹ØÏµ
+    vector<Point2f> m_LeftInlier;           //×óÍ¼Æ¥Åäµã
+    vector<Point2f> m_RightInlier;          //ÓÒÍ¼Æ¥Åäµã
+    vector<DMatch> m_InlierMatches;         //Æ¥Åä¹ØÏµ
 
     m_InlierMatches.resize(InlinerCount);
     m_LeftInlier.resize(InlinerCount);
     m_RightInlier.resize(InlinerCount);
     InlinerCount = 0;
-    float inlier_minRx = img1.cols;        //ç”¨äºŽå­˜å‚¨å†…ç‚¹ä¸?å³å›¾æœ€å°æ¨ªåæ ‡ï¼Œä»¥ä¾¿åŽç»?èžåˆ
+    float inlier_minRx = img1.cols;        //ÓÃÓÚ´æ´¢ÄÚµãÖÐÓÒÍ¼×îÐ¡ºá×ø±ê£¬ÒÔ±ãºóÐøÈÚºÏ
 
     for (int i = 0; i < ptCount; i++)
     {
         if (m_RANSACStatus[i] != 0)
         {
-            //å·¦å›¾åŒ¹é…ç‚¹åæ ?
+            //×óÍ¼Æ¥Åäµã×ø±ê
             m_LeftInlier[InlinerCount].x = p1.at<float>(i, 0);
             m_LeftInlier[InlinerCount].y = p1.at<float>(i, 1);
-            //å³å›¾åŒ¹é…ç‚¹åæ ?
+            //ÓÒÍ¼Æ¥Åäµã×ø±ê
             m_RightInlier[InlinerCount].x = p2.at<float>(i, 0);
             m_RightInlier[InlinerCount].y = p2.at<float>(i, 1);
-            //åŒ¹é…å…³ç³»
+            //Æ¥Åä¹ØÏµ
             m_InlierMatches[InlinerCount].queryIdx = InlinerCount;
             m_InlierMatches[InlinerCount].trainIdx = InlinerCount;
             
-            //å­˜å‚¨åŒ¹é…ç‚¹ä¸­å³å›¾æœ€å°æ¨ªåæ ‡
+            //´æ´¢Æ¥ÅäµãÖÐÓÒÍ¼×îÐ¡ºá×ø±ê
             if (m_RightInlier[InlinerCount].x < inlier_minRx) 
                 inlier_minRx = m_RightInlier[InlinerCount].x;   
 
@@ -149,33 +149,33 @@ void sift(cv::Mat img1, cv::Mat img2)
         }
     }
 
-    // æŠŠå†…ç‚¹è½¬æ?ä¸ºdrawMatcheså?ä»¥ä½¿ç”¨çš„æ ¼å¼
+    // °ÑÄÚµã×ª»»ÎªdrawMatches¿ÉÒÔÊ¹ÓÃµÄ¸ñÊ½
     vector<KeyPoint> key1(InlinerCount);
     vector<KeyPoint> key2(InlinerCount);
     KeyPoint::convert(m_LeftInlier, key1);
     KeyPoint::convert(m_RightInlier, key2);
 
-    // æ˜¾ç¤ºè®¡ç®—Fè¿‡åŽçš„å†…ç‚¹åŒ¹é…?
+    // ÏÔÊ¾¼ÆËãF¹ýºóµÄÄÚµãÆ¥Åä
     Mat OutImage;
     drawMatches(img1, key1, img2, key2, m_InlierMatches, OutImage);
     destroyAllWindows();
 
-    //çŸ©é˜µHç”¨ä»¥å­˜å‚¨RANSACå¾—åˆ°çš„å•åº”çŸ©é˜?
-    Mat H = findHomography(m_LeftInlier, m_RightInlier, RANSAC);        //ä¸¤å¹³é?ä¹‹é—´çš„è½¬æ¢çŸ©é˜?
+    //¾ØÕóHÓÃÒÔ´æ´¢RANSACµÃµ½µÄµ¥Ó¦¾ØÕó
+    Mat H = findHomography(m_LeftInlier, m_RightInlier, RANSAC);        //Á½Æ½ÃæÖ®¼äµÄ×ª»»¾ØÕó
 
-    //å­˜å‚¨å·¦å›¾å››è?’ï¼ŒåŠå…¶å˜æ¢åˆ°å³å›¾ä½ç½?
+    //´æ´¢×óÍ¼ËÄ½Ç£¬¼°Æä±ä»»µ½ÓÒÍ¼Î»ÖÃ
     std::vector<Point2f> obj_corners(4);
     obj_corners[0] = Point(0, 0); 
     obj_corners[1] = Point(img1.cols, 0);
     obj_corners[2] = Point(img1.cols, img1.rows); 
     obj_corners[3] = Point(0, img1.rows);
 
-    std::vector<Point2f> scene_corners(4);      //å·¦å›¾å››è?’å˜æ¢åˆ°å³å›¾çš„ä½ç½?
+    std::vector<Point2f> scene_corners(4);      //×óÍ¼ËÄ½Ç±ä»»µ½ÓÒÍ¼µÄÎ»ÖÃ
 
-    //è½?æ?
-    perspectiveTransform(obj_corners, scene_corners, H);                //æŠ•å½±åˆ°å³ä¾§çš„æ–°è?†è??  æŒ‰åŒ¹é…çš„ç‰¹å¾ç‚¹ä½ç½?è¿›è?Œè½¬æ¢æŠ•å½?
-
-    //ç”»å‡ºå˜æ¢åŽå›¾åƒä½ç½?
+    //×ª»»
+    perspectiveTransform(obj_corners, scene_corners, H);                //Í¶Ó°µ½ÓÒ²àµÄÐÂÊÓ½Ç  °´Æ¥ÅäµÄÌØÕ÷µãÎ»ÖÃ½øÐÐ×ª»»Í¶Ó°
+    
+    //»­³ö±ä»»ºóÍ¼ÏñÎ»ÖÃ
     Point2f offset((float)img1.cols, 0);
     //Point2f offset(0, 0);
 
@@ -183,18 +183,18 @@ void sift(cv::Mat img1, cv::Mat img2)
     line(OutImage, scene_corners[1] + offset, scene_corners[2] + offset, Scalar(0, 255, 0), 4);
     line(OutImage, scene_corners[2] + offset, scene_corners[3] + offset, Scalar(0, 255, 0), 4);
     line(OutImage, scene_corners[3] + offset, scene_corners[0] + offset, Scalar(0, 255, 0), 4);
-    // imshow("Good Matches & Object detectionå·¦å›¾è½?æ¢åŽçš„ä½ç½?æ ‡æ³¨", OutImage);
+    // imshow("Good Matches & Object detection", OutImage);
     // waitKey(0);
 
-    int drift = scene_corners[1].x;                                                        //å‚¨å­˜åç§»é‡?
+    int drift = scene_corners[1].x;                                                        //´¢´æÆ«ÒÆÁ¿
 
-    //æ–°å»ºä¸€ä¸?çŸ©é˜µå­˜å‚¨é…å‡†åŽå››è§’çš„ä½ç½®
+    //ÐÂ½¨Ò»¸ö¾ØÕó´æ´¢Åä×¼ºóËÄ½ÇµÄÎ»ÖÃ
     int width = int(max(abs(scene_corners[1].x), abs(scene_corners[2].x)));
-    int height = img1.rows;                                                                  //æˆ–è€…ï¼šint height = int(max(abs(scene_corners[2].y), abs(scene_corners[3].y)));
-    float origin_x = 0,                                                         //å·¦å›¾è½?æ¢åŽè¶…å‡º0åæ ‡å·¦ä¾§çš„å›¾åƒçš„å®½åº¦å¤§å°
+    int height = img1.rows;                                                                
+    float origin_x = 0,                                                         //×óÍ¼×ª»»ºó³¬³ö0×ø±ê×ó²àµÄÍ¼ÏñµÄ¿í¶È´óÐ¡
         origin_y = 0;
 
-    //è®¡ç®—å·¦å›¾è½?æ?ä¹‹åŽçš„å?½å’Œé«?
+    //¼ÆËã×óÍ¼×ª»»Ö®ºóµÄ¿íºÍ¸ß
     if (scene_corners[0].x < 0) 
     {
         if (scene_corners[3].x < 0) 
@@ -209,67 +209,67 @@ void sift(cv::Mat img1, cv::Mat img2)
             origin_y += min(scene_corners[0].y, scene_corners[1].y);
         else origin_y += scene_corners[0].y;
     }
-    //å?é€‰ï¼šheight-=int(origin_y);
-    Mat imageturn = Mat::zeros(width, height, img1.type());     //å·¦å›¾å˜æ¢åŽçš„
+    //¿ÉÑ¡£ºheight-=int(origin_y);
+    Mat imageturn = Mat::zeros(width, height, img1.type());     //×óÍ¼±ä»»ºóµÄ
 
-    //èŽ·å–æ–°çš„å˜æ¢çŸ©é˜µï¼Œä½¿å›¾åƒå®Œæ•´æ˜¾ç¤º      
+    //»ñÈ¡ÐÂµÄ±ä»»¾ØÕó£¬Ê¹Í¼ÏñÍêÕûÏÔÊ¾    
     for (int i = 0;i < 4;i++) 
     { 
-        scene_corners[i].x -= origin_x;                             //è¡¥å¿æ˜¾ç¤ºä¸å…¨çš„ä½ç½?ï¼Œè¶…å‡?0åæ ‡å·¦ä¾§çš„å›¾åƒå?½åº¦ä¸ºorigin.x
-        //å?é€‰ï¼šscene_corners[i].y -= (float)origin_y; }
+        scene_corners[i].x -= origin_x;                             //²¹³¥ÏÔÊ¾²»È«µÄÎ»ÖÃ£¬³¬³ö0×ø±ê×ó²àµÄÍ¼Ïñ¿í¶ÈÎªorigin.x
+        //¿ÉÑ¡£ºscene_corners[i].y -= (float)origin_y; }
     }    
-    Mat H1 = getPerspectiveTransform(obj_corners, scene_corners);       //é‡æ–°è®¡ç®—å·¦å›¾çš„å®žé™…è½¬æ¢çŸ©é˜?
+    Mat H1 = getPerspectiveTransform(obj_corners, scene_corners);       //ÖØÐÂ¼ÆËã×óÍ¼µÄÊµ¼Ê×ª»»¾ØÕó?
 
-    //è¿›è?Œå·¦å›¾å›¾åƒå˜æ?ï¼Œæ˜¾ç¤ºæ•ˆæž?    å·¦ä¾§å›¾åƒå˜æ¢çš„åŸºå‡†æ˜¯å·¦å³ä¾§å?¹åº”ç‚¹ï¼Œå°†å·¦ä¾§å?¹åº”ç‚¹åœ¨å›¾åƒä¸?çš„ä½ç½?è½?æ¢åˆ°è¯¥å?¹åº”ç‚¹åœ¨å³å›¾ä¸?çš„ä½ç½?
+    //½øÐÐ×óÍ¼Í¼Ïñ±ä»»£¬ÏÔÊ¾Ð§¹û    ×ó²àÍ¼Ïñ±ä»»µÄ»ù×¼ÊÇ×óÓÒ²à¶ÔÓ¦µã£¬½«×ó²à¶ÔÓ¦µãÔÚÍ¼ÏñÖÐµÄÎ»ÖÃ×ª»»µ½¸Ã¶ÔÓ¦µãÔÚÓÒÍ¼ÖÐµÄÎ»ÖÃ
     warpPerspective(img1, imageturn, H1, Size(width, height));
-    // imshow("image_Perspectiveå·¦å›¾å˜æ¢å?", imageturn);
+    // imshow("image_Perspective after the left picture change", imageturn);
     // waitKey(0);
 
-    //å›¾åƒèžåˆ
-    int width_ol = width - int(inlier_minRx - origin_x);                    //é‡å åŒºåŸŸçš„å??
-    int start_x = int(inlier_minRx - origin_x);                         //imageturnä¸Šçš„é‡å åŒºåŸŸçš„èµ·å§‹åæ ?  å³ä¾§å†…ç‚¹çš„æœ€å°ç‚¹-origin_x
-    //é‡å åŒºåŸŸå¼€å§‹çš„æ¨?åæ ‡ä¸ºå³å›¾ä¸Šçš„æœ€å°æ¨ªåæ ‡çš„å†…ç‚¹åœ¨imageturnä¸Šçš„åæ ‡ï¼Œå³ä¾§ä¸ºå·¦å›¾çš„å³è¾¹ç•Œ
+    //Í¼ÏñÈÚºÏ
+    int width_ol = width - int(inlier_minRx - origin_x);                    //ÖØµþÇøÓòµÄ¿í
+    int start_x = int(inlier_minRx - origin_x);                         //imageturnÉÏµÄÖØµþÇøÓòµÄÆðÊ¼×ø±ê  ÓÒ²àÄÚµãµÄ×îÐ¡µã-origin_x
+    //ÖØµþÇøÓò¿ªÊ¼µÄºá×ø±êÎªÓÒÍ¼ÉÏµÄ×îÐ¡ºá×ø±êµÄÄÚµãÔÚimageturnÉÏµÄ×ø±ê£¬ÓÒ²àÎª×óÍ¼µÄÓÒ±ß½ç
     cout << "width: " << width << endl;
     cout << "img1.width: " << img1.cols << endl;
     cout << "start_x: " << start_x << endl;
     cout << "width_ol: " << width_ol << endl;
 
-    uchar* ptr = imageturn.data;            //å·¦ä¾§å›¾åƒè½?æ?ä¹‹åŽçš„å›¾åƒæ•°æ?
-    double alpha = 0, beta = 1;             //å®šä¹‰æƒé‡
+    uchar* ptr = imageturn.data;            //×ó²àÍ¼Ïñ×ª»»Ö®ºóµÄÍ¼ÏñÊý¾Ý
+    double alpha = 0, beta = 1;             //¶¨ÒåÈ¨ÖØ
 
-    //æŒ‰æƒé‡è?¡ç®—é‡åˆéƒ¨åˆ†çš„åƒç´ å€?
-    for (int row = 0;row < height;row++) //å›¾åƒè½?æ?ä¹‹åŽçš„é«˜åº?
+    //°´È¨ÖØ¼ÆËãÖØºÏ²¿·ÖµÄÏñËØÖµ
+    for (int row = 0;row < height;row++) //Í¼Ïñ×ª»»Ö®ºóµÄ¸ß¶È
     {
-        //stepå?ä»¥ç†è§£ä¸ºMatçŸ©é˜µä¸?æ¯ä¸€è¡Œçš„â€œæ?¥é•¿â€ï¼Œä»¥å­—èŠ‚ä¸ºåŸºæœ¬å•ä½ï¼Œæ¯ä¸€è¡Œä¸­æ‰€æœ‰å…ƒç´ çš„å­—èŠ‚æ€»é‡ï¼Œæ˜¯ç´?è®¡äº†ä¸€è¡Œä¸­æ‰€æœ‰å…ƒç´ ã€æ‰€æœ‰é€šé“ã€æ‰€æœ‰é€šé“çš„elemSize1ä¹‹åŽçš„å€?
-        //elemSize: é€šé“æ•?
+        //step¿ÉÒÔÀí½âÎªMat¾ØÕóÖÐÃ¿Ò»ÐÐµÄ¡°²½³¤¡±£¬ÒÔ×Ö½ÚÎª»ù±¾µ¥Î»£¬Ã¿Ò»ÐÐÖÐËùÓÐÔªËØµÄ×Ö½Ú×ÜÁ¿£¬ÊÇÀÛ¼ÆÁËÒ»ÐÐÖÐËùÓÐÔªËØ¡¢ËùÓÐÍ¨µÀ¡¢ËùÓÐÍ¨µÀµÄelemSize1Ö®ºóµÄÖµ
+        //elemSize: Í¨µÀÊý
 
-        ptr = imageturn.data + row * imageturn.step + (start_x)*imageturn.elemSize();       //å·¦å›¾ç¬?ä¸€é€šé“  ä»Žé‡å éƒ¨åˆ†å¼€å§?
+        ptr = imageturn.data + row * imageturn.step + (start_x)*imageturn.elemSize();      //×óÍ¼µÚÒ»Í¨µÀ  ´ÓÖØµþ²¿·Ö¿ªÊ¼
         for (int col = 0;col < width_ol;col++)
         {
-            uchar* ptr_c1 = ptr + imageturn.elemSize1();       //å·¦å›¾ç¬?äºŒé€šé“ 
-            uchar* ptr_c2 = ptr_c1 + imageturn.elemSize1();     //å·¦å›¾ç¬?ä¸‰é€šé“
+            uchar* ptr_c1 = ptr + imageturn.elemSize1();       //×óÍ¼µÚ¶þÍ¨µÀ
+            uchar* ptr_c2 = ptr_c1 + imageturn.elemSize1();     //×óÍ¼µÚÈýÍ¨µÀ
             
-            uchar* ptr2 = img2.data + row * img2.step + (col + int(inlier_minRx)) * img2.elemSize(); //å³å›¾ç¬?ä¸€é€šé“  ä»Žé‡åˆéƒ¨åˆ†å¼€å§‹è?¡ç®—
-            uchar* ptr2_c1 = ptr2 + img2.elemSize1(); //å³å›¾ç¬?äºŒé€šé“
-            uchar* ptr2_c2 = ptr2_c1 + img2.elemSize1();//å³å›¾ç¬?ä¸‰é€šé“
+            uchar* ptr2 = img2.data + row * img2.step + (col + int(inlier_minRx)) * img2.elemSize(); //ÓÒÍ¼µÚÒ»Í¨µÀ  ´ÓÖØºÏ²¿·Ö¿ªÊ¼¼ÆËã
+            uchar* ptr2_c1 = ptr2 + img2.elemSize1(); //ÓÒÍ¼µÚ¶þÍ¨µÀ
+            uchar* ptr2_c2 = ptr2_c1 + img2.elemSize1();//ÓÒÍ¼µÚÈýÍ¨µÀ
 
             alpha = double(col) / double(width_ol); 
             beta = 1 - alpha;
 
-            //å·¦å›¾ä¸?è½?æ?äº†ä¹‹åŽçš„æ— åƒç´ å€¼çš„é»‘ç‚¹ï¼Œåˆ™å®Œå…¨æ‹·è´å³ä¾§å›¾çš„åƒç´ å€?
+            //×óÍ¼ÖÐ×ª»»ÁËÖ®ºóµÄÎÞÏñËØÖµµÄºÚµã£¬ÔòÍêÈ«¿½±´ÓÒ²àÍ¼µÄÏñËØÖµ
             if (*ptr == 0 && *ptr_c1 == 0 && *ptr_c2 == 0) 
             {
-                *ptr = (*ptr2);                 //å·¦å›¾è¯¥åƒç´ ç??ä¸€é€šé“    
-                *ptr_c1 = (*ptr2_c1);           //å·¦å›¾è¯¥åƒç´ ç??äºŒé€šé“
-                *ptr_c2 = (*ptr2_c2);           //å·¦å›¾è¯¥åƒç´ ç??ä¸‰é€šé“
+                *ptr = (*ptr2);                 //×óÍ¼¸ÃÏñËØµÚÒ»Í¨µÀ
+                *ptr_c1 = (*ptr2_c1);           //×óÍ¼¸ÃÏñËØµÚ¶þÍ¨µÀ
+                *ptr_c2 = (*ptr2_c2);           //×óÍ¼¸ÃÏñËØµÚÈýÍ¨µÀ
             }
 
-            //ä¸æ˜¯é»‘ç‚¹çš„æŒ‰æƒé‡è®¡ç®—
-            *ptr = (*ptr) * beta + (*ptr2) * alpha;//å·¦å›¾é€šé“1çš„åƒç´ å€¼ä¹˜ä»¥æƒé‡?+å³ä¾§é€šé“1åƒç´ å€¼ä¹˜ä»¥æƒé‡?
+            //²»ÊÇºÚµãµÄ°´È¨ÖØ¼ÆËã
+            *ptr = (*ptr) * beta + (*ptr2) * alpha;////×óÍ¼Í¨µÀ1µÄÏñËØÖµ³ËÒÔÈ¨ÖØ+ÓÒ²àÍ¨µÀ1ÏñËØÖµ³ËÒÔÈ¨ÖØ
             *ptr_c1 = (*ptr_c1) * beta + (*ptr2_c1) * alpha;
             *ptr_c2 = (*ptr_c2) * beta + (*ptr2_c2) * alpha;
 
-            //æŒ‡é’ˆåŽç§»
+            //Ö¸ÕëºóÒÆ
             ptr += imageturn.elemSize();
         }
         
@@ -285,34 +285,34 @@ void sift(cv::Mat img1, cv::Mat img2)
     for (int row = 0;row < height;row++) 
     {
 
-        //å°†å·¦ä¾§å›¾åƒèžå…¥ç»“æžœå›¾åƒ?
-        ptr_r = img_result.data + row * img_result.step;//æŒ‡å‘ç»“æžœå›¾åƒçš„æŒ‡é’?  ç¬?ä¸€é€šé“
+        //½«×ó²àÍ¼ÏñÈÚÈë½á¹ûÍ¼Ïñ
+        ptr_r = img_result.data + row * img_result.step;//Ö¸Ïò½á¹ûÍ¼ÏñµÄÖ¸Õë  µÚÒ»Í¨µÀ
         for (int col = 0;col < imageturn.cols;col++)
         {
-            uchar* ptr_rc1 = ptr_r + imageturn.elemSize1();//æŒ‡å‘ç»“æžœå›¾åƒçš„æŒ‡é’?  ç¬?äºŒé€šé“    
-            uchar* ptr_rc2 = ptr_rc1 + imageturn.elemSize1(); //æŒ‡å‘ç»“æžœå›¾åƒçš„æŒ‡é’?  ç¬?ä¸‰é€šé“ 
+            uchar* ptr_rc1 = ptr_r + imageturn.elemSize1();//Ö¸Ïò½á¹ûÍ¼ÏñµÄÖ¸Õë  µÚ¶þÍ¨µÀ      
+            uchar* ptr_rc2 = ptr_rc1 + imageturn.elemSize1(); //Ö¸Ïò½á¹ûÍ¼ÏñµÄÖ¸Õë  µÚÈýÍ¨µÀ 
 
-            uchar* ptr = imageturn.data + row * imageturn.step + col * imageturn.elemSize();//æŒ‡å‘   å·¦ä¾§å›¾åƒçš„æŒ‡é’?   ç¬?ä¸€é€šé“
-            uchar* ptr_c1 = ptr + imageturn.elemSize1();//ç¬?äºŒé€šé“
-            uchar* ptr_c2 = ptr_c1 + imageturn.elemSize1();//ç¬?ä¸‰é€šé“
+            uchar* ptr = imageturn.data + row * imageturn.step + col * imageturn.elemSize();//Ö¸Ïò   ×ó²àÍ¼ÏñµÄÖ¸Õë   µÚÒ»Í¨µÀ
+            uchar* ptr_c1 = ptr + imageturn.elemSize1();//µÚ¶þÍ¨µÀ
+            uchar* ptr_c2 = ptr_c1 + imageturn.elemSize1();//µÚÈýÍ¨µÀ
                                                                                 
-            *ptr_r = *ptr; //å…¨éƒ¨èµ‹å€¼ä¸ºå·¦ä¾§å›¾åƒçš„åƒç´ å€?
+            *ptr_r = *ptr; //È«²¿¸³ÖµÎª×ó²àÍ¼ÏñµÄÏñËØÖµ
             *ptr_rc1 = *ptr_c1;
             *ptr_rc2 = *ptr_c2;
 
             ptr_r += img_result.elemSize();
         }
 
-        //å°†å³ä¾§å›¾åƒèžåˆè¿›ç»“æžœå›¾åƒ
-        ptr_r = img_result.data + row * img_result.step + imageturn.cols * img_result.elemSize();//æŒ‡å‘ç»“æžœå›¾åƒçš„æŒ‡é’?   ä»Žå·¦ä¾§å›¾åƒçš„å³è¾¹ç•Œå¼€å§‹è?¡ç®—
+        //½«ÓÒ²àÍ¼ÏñÈÚºÏ½ø½á¹ûÍ¼Ïñ
+        ptr_r = img_result.data + row * img_result.step + imageturn.cols * img_result.elemSize();//Ö¸Ïò½á¹ûÍ¼ÏñµÄÖ¸Õë   ´Ó×ó²àÍ¼ÏñµÄÓÒ±ß½ç¿ªÊ¼¼ÆËã
         for (int col = imageturn.cols;col < img_result.cols;col++)
         {
-            uchar* ptr_rc1 = ptr_r + imageturn.elemSize1();//æŒ‡å‘ç»“æžœå›¾åƒæŒ‡é’ˆ    ç¬?äºŒé€šé“
-            uchar* ptr_rc2 = ptr_rc1 + imageturn.elemSize1();//æŒ‡å‘ç»“æžœå›¾åƒ       ç¬?ä¸‰é€šé“
+            uchar* ptr_rc1 = ptr_r + imageturn.elemSize1();//Ö¸Ïò½á¹ûÍ¼ÏñÖ¸Õë    µÚ¶þÍ¨µÀ
+            uchar* ptr_rc2 = ptr_rc1 + imageturn.elemSize1();//Ö¸Ïò½á¹ûÍ¼Ïñ       µÚÈýÍ¨µÀ
 
-            uchar* ptr2 = img2.data + row * img2.step + (col - imageturn.cols + drift) * img2.elemSize();     //æŒ‡å‘å³ä¾§å›¾åƒ      ä»Žé‡åˆéƒ¨åˆ†å¼€å§‹è?¡ç®— é‡åˆéƒ¨åˆ†èµ·ç‚¹ä¸ºå³ä¾§å›¾åƒä¸­çš„ç??ä¸€ä¸?åŒ¹é…ç‚¹å??
-            uchar* ptr2_c1 = ptr2 + img2.elemSize1();//æŒ‡å‘å³ä¾§å›¾åƒ   ç¬?äºŒé€šé“
-            uchar* ptr2_c2 = ptr2_c1 + img2.elemSize1();//æŒ‡å‘å³ä¾§å›¾åƒ   ç¬?ä¸‰é€šé“
+            uchar* ptr2 = img2.data + row * img2.step + (col - imageturn.cols + drift) * img2.elemSize();      //Ö¸ÏòÓÒ²àÍ¼Ïñ      ´ÓÖØºÏ²¿·Ö¿ªÊ¼¼ÆËã ÖØºÏ²¿·ÖÆðµãÎªÓÒ²àÍ¼ÏñÖÐµÄµÚÒ»¸öÆ¥Åäµã¶Ô            
+            uchar* ptr2_c1 = ptr2 + img2.elemSize1();//Ö¸ÏòÓÒ²àÍ¼Ïñ   µÚ¶þÍ¨µÀ
+            uchar* ptr2_c2 = ptr2_c1 + img2.elemSize1();//Ö¸ÏòÓÒ²àÍ¼Ïñ   µÚÈýÍ¨µÀ
 
             *ptr_r = *ptr2;
             *ptr_rc1 = *ptr2_c1;
@@ -322,13 +322,8 @@ void sift(cv::Mat img1, cv::Mat img2)
         }
     }
 
-    // imshow("image_resultèžåˆç»“æžœ", img_result);
+    // imshow("image_result", img_result);
     cv::imwrite("final_result.jpg", img_result);
-    // while (1)
-    // {
-	// 	// if (waitKey(100) == 19) //cvSaveImage("E:\\final_result.jpg", &IplImage(img_result));
-	// 	if (waitKey(100) == 27) break; //æŒ‰escé€€å‡ºï¼Œctl+sä¿å­˜å›¾åƒ
-    // }
     cout << "successfully compute!\n";
     return;
 }
@@ -358,7 +353,7 @@ int main(int argc, char * argv[]) try
     pipe.start(cfg);
 
     using namespace cv;
-    const auto window_name = "Display Image";
+    const auto window_name = "left Image";
     namedWindow(window_name, WINDOW_AUTOSIZE);
     
     while (waitKey(1) < 0 && getWindowProperty(window_name, WND_PROP_AUTOSIZE) >= 0)
@@ -368,26 +363,15 @@ int main(int argc, char * argv[]) try
         rs2::video_frame left_frame = data.get_infrared_frame(1);
         rs2::video_frame right_frame = data.get_infrared_frame(2);
 
-        // auto pf = left_frame.get_profile().as<rs2::video_stream_profile>();
-        // auto w = pf.width();
-        // auto h = pf.height();
-        int w = 640, h = 480;
-        // rs2::frame color = data.get_color_frame();
-        // rs2::frame depth = data.get_depth_frame().apply_filter(color_map);
+        auto pf = left_frame.get_profile().as<rs2::video_stream_profile>();
+        auto w = pf.width();
+        auto h = pf.height();
 
-        // Query frame size (width and height)
-        // const int w = depth.as<rs2::video_frame>().get_width();
-        // const int h = depth.as<rs2::video_frame>().get_height();
         Mat image1(Size(w, h), CV_8UC1, (void*)left_frame.get_data());
         Mat image2(Size(w, h), CV_8UC1, (void*)right_frame.get_data());
-        // imshow("color image", image2);
-        
-        // Create OpenCV matrix of size (w,h) from the colorized depth data
-        // Mat image(Size(w, h), CV_8UC3, (void*)depth.get_data(), Mat::AUTO_STEP);
-        // Mat pic_left(Size(w, h), CV_8UC1, (void*)left_frame.get_data());
-        // Update the window with new data
+
         imshow(window_name, image1);
-        imshow("right", image2);
+        imshow("right Image", image2);
 
         static int i = 0;
         if (++i == 100)
@@ -397,8 +381,6 @@ int main(int argc, char * argv[]) try
             sift(image1, image2);
             break;
         }
-        
-        // imshow("left image", pic_left);
 
     }
 
