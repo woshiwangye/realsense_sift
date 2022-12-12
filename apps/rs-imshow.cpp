@@ -67,7 +67,7 @@ void sift(cv::Mat img1, cv::Mat img2)
 
     Mat img_matches;
     drawMatches(img1, m_LeftKey, img2, m_RightKey, matches, img_matches);
-    // imshow("�?匹配消除�?",img_matches);
+    // imshow("initial sift result",img_matches);
     imwrite("result_without_ransanc.jpg", img_matches);
     
     Mat result;
@@ -374,7 +374,7 @@ int main(int argc, char * argv[]) try
         imshow("right Image", image2);
 
         static int i = 0;
-        if (++i == 100)
+        if (++i == 100000)
         {
             imwrite("a.jpg", image1);
             imwrite("b.jpg", image2);

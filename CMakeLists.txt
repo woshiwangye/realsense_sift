@@ -19,30 +19,19 @@ if(NOT OpenCV_FOUND)
   message(FATAL_ERROR "OpenCV > 4.5 not found.")
 endif()
 
-# set(OpenGL_GL_PREFERENCE GLVND)
-# find_package(OpenGL REQUIRED)
-# if(NOT OpenGL_FOUND)
-#    message(FATAL_ERROR "OpenGL not found.")
-# endif()
-
 find_package(realsense2 REQUIRED)
 MESSAGE("realsense include dirs: " ${realsense2_INCLUDE_DIRS})
 MESSAGE("realsense include dirs: " ${realsense2_LIBRARY})
 
-
 MESSAGE("opencv include dirs: " ${OpenCV_INCLUDE_DIRS})
 
 include_directories(
-    include
     ${OpenCV_INCLUDE_DIRS}
     ${realsense2_INCLUDE_DIRS}
     # ${OpenGL_INCLUDE_DIR}
 )
 
-aux_source_directory(src DIR_SRCS)
-
 add_executable(imshow apps/rs-imshow.cpp
-    ${DIR_SRCS}
 )
 
 link_directories(/usr/lib/x86_64-linux-gnu)
